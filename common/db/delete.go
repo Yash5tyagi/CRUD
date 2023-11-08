@@ -1,14 +1,15 @@
 package db
 
 import (
-	"CRUD/common/views"
 	"context"
 	"log"
+
+	"github.com/google/uuid"
 )
 
-func (db *DB) DelStudent(stud *views.Student) {
+func (db *DB) DelStudent(id uuid.UUID) {
 	QueryString := "DELETE FROM students WHERE id=$1"
-	_, err := db.Conn.Query(context.Background(), QueryString, stud.Id)
+	_, err := db.Conn.Query(context.Background(), QueryString, id)
 	if err != nil {
 		log.Fatal(err)
 	}
