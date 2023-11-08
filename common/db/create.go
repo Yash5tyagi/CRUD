@@ -7,7 +7,7 @@ import (
 )
 
 func (db *DB) InsertStudent(stud *views.Student) {
-	querystring := "INSERT INTO students (first_name,last_name,roll_no) VALUES ($1,$2,$3) RETURNING id"
+	querystring := "INSERT INTO students (first_name,last_name,roll_no) VALUES ($1,$2,$3) ON CONFLICT(roll_no) RETURNING id"
 	err := db.Conn.QueryRow(context.Background(), querystring, stud.FirstName, stud.LastName, stud.RollNo).Scan(&stud.Id)
 	if err != nil {
 		log.Fatal(err)
