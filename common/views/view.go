@@ -14,3 +14,9 @@ type Parents struct {
 	FatherName string    `json:"father_name"`
 	MotherName string    `json:"mother_name"`
 }
+
+type User struct {
+	UserName string `json:"username"`
+	Password string `json:"user_password"`
+	UId      int    `json:"uid"`
+}
