@@ -12,4 +12,5 @@ func Handler(rout Serv, conn db.DB) {
 	rout.Srv.PUT("/parents/update", EditParents(conn))
 	rout.Srv.DELETE("/students/delete", RemoveStudent(conn))
 	rout.Srv.POST("/user/create", AddUser(conn))
+	rout.Srv.POST("/user/check", CheckUser(conn))
 }

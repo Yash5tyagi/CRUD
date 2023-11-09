@@ -3,6 +3,7 @@ package handler
 import (
 	"CRUD/common/db"
 	"CRUD/common/views"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -31,29 +32,41 @@ func AddUser(conn db.DB) gin.HandlerFunc {
 	}
 }
 
-// func CheckUser(conn db.DB) gin.HandlerFunc {
-// 	return func(ctx *gin.Context) {
-// 		type user struct{
-// 			Username string `json:"username"`
-// 			Password string `json:"password"`
-// 		}
-// 		rows := conn.SelectUser()
+func CheckUser(conn db.DB) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		var User struct {
+			Username string `json:"username"`
+			Password string `json:"password"`
+		}
+		if err := ctx.ShouldBindJSON(&User); err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 
-// 		defer rows.Close()
-// 		var usrs []views.User
-// 		for rows.Next() {
-// 			var usr views.User
+		}
 
-// 			if err := rows.Scan(&usr., &usr.MotherName); err != nil {
+		rows := conn.SelectUser(User.Username)
 
-// 				ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-// 			}
-// 			usrs = append(usrs, usr)
-// 		}
-// 		fmt.Println("Parents:")
-// 		for _, parent := range usrs {
-// 			fmt.Printf("father name: %s, mother name: %s\n", parent.FatherName, parent.MotherName)
-// 		}
-// 		ctx.JSON(http.StatusOK, usrs)
-// 	}
-// }
+		defer rows.Close()
+		var usrs []views.User
+		for rows.Next() {
+			var usr views.User
+
+			if err := rows.Scan(&usr.UId, &usr.UserName, &usr.Password); err != nil {
+
+				ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			}
+			usrs = append(usrs, usr)
+		}
+		if len(usrs) == 0 {
+			ctx.JSON(http.StatusBadRequest, "Wrong Username")
+			return
+		}
+		for _, u := range usrs {
+			if err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(User.Password)); err != nil {
+				ctx.JSON(http.StatusBadRequest, "Wrong Password")
+				return
+			}
+			fmt.Printf("uid:%d username:%s password:%s", u.UId, u.UserName, u.Password)
+		}
+		ctx.JSON(http.StatusOK, usrs)
+	}
+}
