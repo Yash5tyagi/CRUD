@@ -2,11 +2,12 @@ package handler
 
 import (
 	"CRUD/common/db"
+	middlewares "CRUD/common/middleware"
 )
 
 func Handler(rout Serv, conn db.DB) {
-	rout.Srv.GET("/parents/get", GetALLParent(conn))
-	rout.Srv.GET("/students/get", GetALLStudent(conn))
+	rout.Srv.GET("/parents/get", middlewares.JwtAuthMiddleware(), GetALLParent(conn))
+	rout.Srv.GET("/students/get", middlewares.JwtAuthMiddleware(), GetALLStudent(conn))
 	rout.Srv.POST("/students/add", AddStudent(conn))
 	rout.Srv.PUT("/students/update", EditStudents(conn))
 	rout.Srv.PUT("/parents/update", EditParents(conn))

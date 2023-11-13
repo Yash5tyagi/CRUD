@@ -2,6 +2,7 @@ package handler
 
 import (
 	"CRUD/common/db"
+	middlewares "CRUD/common/middleware"
 	"CRUD/common/views"
 	"fmt"
 	"log"
@@ -73,7 +74,7 @@ func CheckUser(conn db.DB) gin.HandlerFunc {
 			}
 			fmt.Printf("username:%s password:%s", u.UserName, u.Password)
 		}
-		token, err := GenerateToken(User.Username)
+		token, err := middlewares.GenerateToken(User.Username)
 
 		if err != nil {
 			log.Fatal(err)
