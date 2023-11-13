@@ -1,6 +1,9 @@
 package views
 
-import "github.com/google/uuid"
+import (
+	"github.com/google/uuid"
+	"gorm.io/gorm"
+)
 
 type Student struct {
 	Id        uuid.UUID `json:"id"`
@@ -16,7 +19,7 @@ type Parents struct {
 }
 
 type User struct {
+	gorm.Model
 	UserName string `json:"username"`
-	Password string `json:"user_password"`
-	UId      int    `json:"uid"`
+	Password string `json:"password"`
 }

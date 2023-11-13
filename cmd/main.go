@@ -3,6 +3,7 @@ package main
 import (
 	"CRUD/common/db"
 	"CRUD/common/handler"
+	middlewares "CRUD/common/middleware"
 	"context"
 	"fmt"
 	"log"
@@ -19,7 +20,9 @@ func main() {
 
 	con := db.New(db.Init())
 	rt := handler.New()
+
 	handler.Handler(*rt, *con)
+	rt.Srv.Use(middlewares.JwtAuthMiddleware())
 	ApiHost := os.Getenv("API_HOST")
 	ApiPort := os.Getenv("API_PORT")
 	rt.Srv.Run(fmt.Sprintf("%s:%s", ApiHost, ApiPort))

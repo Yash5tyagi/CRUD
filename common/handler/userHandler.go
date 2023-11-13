@@ -9,6 +9,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
 func AddUser(conn db.DB) gin.HandlerFunc {
@@ -32,9 +33,14 @@ func AddUser(conn db.DB) gin.HandlerFunc {
 	}
 }
 
+func VerifyPassword(password, hashedPassword string) error {
+	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
+}
+
 func CheckUser(conn db.DB) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var User struct {
+			gorm.Model
 			Username string `json:"username"`
 			Password string `json:"password"`
 		}
@@ -50,7 +56,7 @@ func CheckUser(conn db.DB) gin.HandlerFunc {
 		for rows.Next() {
 			var usr views.User
 
-			if err := rows.Scan(&usr.UId, &usr.UserName, &usr.Password); err != nil {
+			if err := rows.Scan(&usr.UserName, &usr.Password); err != nil {
 
 				ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			}
@@ -61,12 +67,17 @@ func CheckUser(conn db.DB) gin.HandlerFunc {
 			return
 		}
 		for _, u := range usrs {
-			if err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(User.Password)); err != nil {
+			if err := VerifyPassword(User.Password, u.Password); err != nil {
 				ctx.JSON(http.StatusBadRequest, "Wrong Password")
 				return
 			}
-			fmt.Printf("uid:%d username:%s password:%s", u.UId, u.UserName, u.Password)
+			fmt.Printf("username:%s password:%s", u.UserName, u.Password)
 		}
-		ctx.JSON(http.StatusOK, usrs)
+		token, err := GenerateToken(User.Username)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+		ctx.JSON(http.StatusOK, gin.H{"token": token})
 	}
 }
