@@ -10,10 +10,11 @@ type Student struct {
 	FirstName string    `json:"first_name"`
 	LastName  string    `json:"last_name"`
 	RollNo    int       `json:"roll_no"`
+	PId       uuid.UUID `json:"pid"`
 }
 
 type Parents struct {
-	SId        uuid.UUID `json:"sid"`
+	PId        uuid.UUID `json:"pid"`
 	FatherName string    `json:"father_name"`
 	MotherName string    `json:"mother_name"`
 }

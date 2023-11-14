@@ -31,10 +31,8 @@ func AddStudent(conn db.DB) gin.HandlerFunc {
 		var parent views.Parents
 		parent.FatherName = StudDet.FatherName
 		parent.MotherName = StudDet.MotherName
-
-		conn.InsertStudent(&stud)
-		parent.SId = stud.Id
 		conn.InsertParent(&parent)
-
+		stud.PId = parent.PId
+		conn.InsertStudent(&stud)
 	}
 }
